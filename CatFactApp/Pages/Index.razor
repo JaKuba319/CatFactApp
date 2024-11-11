@@ -1,5 +1,29 @@
 ﻿@page "/"
-
+@inject HttpClient httpclient
 <PageTitle>Index</PageTitle>
 
 <h1>CatFactApp</h1>
+
+<button @onclick="GetCatFact" class="btn btn-primary">Get Cat Fact</button>
+
+@if (catFact != null)
+{
+    <p>@catFact.Fact @catFact.Length</p>
+}
+
+@code{
+    private CatFact catFact;
+
+    private class CatFact
+    {
+        public string Fact { get; set; }
+        public int Length { get; set; }
+    }
+    private async Task GetCatFact()
+    {
+        var response = await httpclient.GetFromJsonAsync<CatFact>("https://catfact.ninja/fact");
+        catFact = response;
+    }
+    
+
+}   
