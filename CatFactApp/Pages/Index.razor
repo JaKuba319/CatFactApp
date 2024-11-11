@@ -6,7 +6,7 @@
 
 <h1>CatFactApp</h1>
 
-<button @onclick="async () => {await GetCatFact(); await SaveCatFact();}" class="btn btn-primary">Get Cat Fact</button>
+<button @onclick="GetCatFact" class="btn btn-primary">Get and Save Cat Fact</button>
 
 @if (catFact != null)
 {
@@ -14,21 +14,27 @@
 }
 
 @code{
-    private CatFact catFact;
+    private CatFact? catFact;
 
     private class CatFact
     {
-        public string Fact { get; set; }
+        public string Fact { get; set; } = default!;
         public int Length { get; set; }
     }
     private async Task GetCatFact()
     {
-        var response = await httpclient.GetFromJsonAsync<CatFact>("https://catfact.ninja/fact");
-        catFact = response;
+        var response = await httpclient.GetAsync("https://catfact.ninja/fact");
+        var fact = await response.Content.ReadFromJsonAsync<CatFact>();
+
+        if (fact != null)
+        {
+            catFact = fact;
+            await SaveCatFact();
+        }
     }
     private async Task SaveCatFact()
     {
-        await fileService.Write("catFact.txt", $"{catFact.Fact} {catFact.Length}");
+        await fileService.Write("catFact.txt", $"{catFact!.Fact} {catFact.Length}");
     }
 
 }   
