@@ -1,10 +1,12 @@
 ﻿@page "/"
+@using CatFactApp.Services
 @inject HttpClient httpclient
+@inject IFileService fileService
 <PageTitle>Index</PageTitle>
 
 <h1>CatFactApp</h1>
 
-<button @onclick="GetCatFact" class="btn btn-primary">Get Cat Fact</button>
+<button @onclick="async () => {await GetCatFact(); await SaveCatFact();}" class="btn btn-primary">Get Cat Fact</button>
 
 @if (catFact != null)
 {
@@ -24,6 +26,9 @@
         var response = await httpclient.GetFromJsonAsync<CatFact>("https://catfact.ninja/fact");
         catFact = response;
     }
-    
+    private async Task SaveCatFact()
+    {
+        await fileService.Write("catFact.txt", $"{catFact.Fact} {catFact.Length}");
+    }
 
 }   
